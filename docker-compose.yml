@@ -15,9 +15,11 @@ services:
       - LOG_LEVEL=INFO
     volumes:
       - ./sample_data:/app/sample_data:ro
+      - ./static:/app/static:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      # test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      test: [ "CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -39,6 +41,7 @@ services:
     volumes:
       - ./app:/app/app:ro
       - ./sample_data:/app/sample_data:ro
+      - ./static:/app/static:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     profiles:
       - dev

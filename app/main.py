@@ -71,6 +71,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Debug logging for filesystem
+import os
+logger = get_logger(__name__)
+cwd = os.getcwd()
+logger.info(f"Current Working Directory: {cwd}")
+logger.info(f"Directory Contents: {os.listdir(cwd)}")
+
+static_dir = os.path.join(cwd, "static")
+if not os.path.exists(static_dir):
+    logger.error(f"Static directory not found at {static_dir}")
+    # Fallback: check if it's in the app directory (host fallback)
+    alt_static = os.path.join(os.path.dirname(__file__), "static")
+    if os.path.exists(alt_static):
+        logger.info(f"Found static directory at alternate location: {alt_static}")
+        static_dir = alt_static
+    else:
+        logger.error(f"Static directory NOT found at {alt_static} either.")
+        # Create it to prevent crash loop, but UI won't work
+        os.makedirs(static_dir, exist_ok=True)
+        logger.warning("Created empty static directory to prevent crash.")
+
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
